@@ -3834,12 +3834,14 @@ void ImGui::GcAwakeTransientWindowBuffers(ImGuiWindow* window)
 void ImGui::SetActiveID(ImGuiID id, ImGuiWindow* window)
 {
     ImGuiContext& g = *GImGui;
+    
 
-
-    for (int i = 0; i < DC.Layouts.Data.Size; i++)
+    for (int i = 0; window != nullptr && i < window->DC.Layouts.Data.Size; i++)
     {
-        ImGuiLayout* layout = (ImGuiLayout*)DC.Layouts.Data[i].val_p;
+        ImGuiLayout* layout = (ImGuiLayout*)window->DC.Layouts.Data[i].val_p;
         IM_DELETE(layout);
+        // POSSIBLE FUTURE SOLUTION FOR A FUTURE ISSUE
+        //Also add window != NULL in the loop conditional. Seems to have been the cause of a headache for me using imgui 1.88 involving crashes when interacting with the demo window
     }
     // While most behaved code would make an effort to not steal active id during window move/drag operations,
     // we at least need to be resilient to it. Cancelling the move is rather aggressive and users of 'master' branch
@@ -3848,6 +3850,7 @@ void ImGui::SetActiveID(ImGuiID id, ImGuiWindow* window)
     {
         IMGUI_DEBUG_LOG_ACTIVEID("SetActiveID() cancel MovingWindow\n");
         g.MovingWindow = NULL;
+        
     }
 
     // Set active id
